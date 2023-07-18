@@ -20,7 +20,7 @@ const Menu: any = () => {
         to={to}
         className={
           match2
-            ? "text-slate-100  scale-125 lg:p-4 font-bold rounded-lg"
+            ? "text-blue-600  scale-125 lg:p-4 font-bold rounded-lg"
             : "text-slate-500 hover:text-slate-100  transition duration-300 hover:no-underline"
         }
       >
@@ -35,8 +35,8 @@ const Menu: any = () => {
         to={to}
         className={
           match
-            ? " flex w-[220px] gap-4  bg-slate-500 hover:bg-slate-600 hover:transition hover:duration-300 text-slate-200 hover:text-slate-200 hover:no-underline lg:p-4 font-bold rounded-lg"
-            : " flex w-[220px] gap-4  hover:bg-slate-700 hover:transition hover:duration-300 hover:text-slate-200 text-slate-400 font-bold hover:no-underline lg:p-4 rounded-lg"
+            ? " flex w-[210px] gap-4  bg-slate-500 hover:bg-slate-600 hover:transition hover:duration-300 text-slate-200 hover:text-slate-200 hover:no-underline lg:p-4 font-bold rounded-lg"
+            : " flex w-[210px] gap-4  hover:bg-slate-700 hover:transition hover:duration-300 hover:text-slate-200 text-slate-400 font-bold hover:no-underline lg:p-4 rounded-lg scale-90"
         }
       >
         {children}

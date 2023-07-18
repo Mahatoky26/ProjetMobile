@@ -24,7 +24,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="lg:col-span-7  h-full overflow-y-scroll">
+    <div className="apple lg:col-span-7  h-full overflow-y-scroll">
       <IonToolbar className="text-2xl lg:text-4xl text-center uppercase">
         <IonTitle className="tracking-widest">
           <div className="titre font-bold flex justify-center gap-4">

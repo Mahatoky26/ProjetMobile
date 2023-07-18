@@ -20,7 +20,7 @@ const Historique = () => {
     );
   }
   return (
-    <div className='lg:col-span-7 space-y-4 overflow-y-scroll'>
+    <div className='apple lg:col-span-7 space-y-4 overflow-y-scroll'>
       <IonToolbar className="text-center"  >
         <IonTitle className="tracking-widest uppercase">
           <div className='flex titre font-bold gap-4 justify-center'>

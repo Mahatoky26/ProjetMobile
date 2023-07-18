@@ -6,7 +6,7 @@ import AchatIcon from "../../assets/AchatIcon";
 const Achat = () => {
   const [selected, setSelected] = useState("environment");
   return (
-    <div className="lg:col-span-7  overflow-y-scroll space-y-4">
+    <div className="apple lg:col-span-7  overflow-y-scroll space-y-4">
       <IonToolbar className="text-center"  >
         <IonTitle className="tracking-widest uppercase">
           <div className="titre font-bold flex gap-4 justify-center">

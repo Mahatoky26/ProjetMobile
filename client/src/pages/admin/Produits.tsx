@@ -4,7 +4,7 @@ import ProduitIcon from "../../assets/ProduitIcon";
 
 function Produits() {
   return (
-    <div className="lg:col-span-7  overflow-y-scroll">
+    <div className="apple lg:col-span-7  overflow-y-scroll">
       <IonToolbar className="text-center"  >
         <IonTitle className="tracking-widest uppercase">
           <div className="titre font-bold flex justify-center gap-4">

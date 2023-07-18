@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function HistoriqueAchat() {
   return (
-    <div>HistoriqueAchat</div>
+    <div className='apple'>HistoriqueAchat</div>
   )
 }
