@@ -1,14 +1,132 @@
 import { IonTitle, IonToolbar } from "@ionic/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProduitIcon from "../../assets/ProduitIcon";
+import axios from "axios";
+// import Produits from './Produits';
+
+type Produits = {
+  idProd: any;
+  ImgPro: string;
+  design: string;
+  Pu: number | undefined;
+  Stock: number | undefined;
+};
 
 function Produits() {
+  const [products, setProducts] = useState<Produits[]>([]);
+  const [product, setProduct] = useState({
+    // ampesaina am formData sy ny input ao am formulaire
+    design: "",
+    Pu: "",
+    Stock: "",
+  });
+  const [logoEdit, setLogoEdit] = useState<string | null>(null); // sary kely rehefa modif
+  const [logoFile, setLogoFile] = useState<File | null>(null); // fichier sary
+  const [idProd, setIdProd] = useState<number | null>(null); //ho an condition post sy put, refa misy de put, refa tsis de post
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = () => {
+    axios.get("http://localhost:2000/AfficherTousProduit").then((res) => {
+      setProduct(res.data);
+    });
+  };
+
+  /* submit form */
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    /* ampidirina tsirairay anaty formData ny anaty four */
+    for (const [name, value] of Object.entries(product)) {
+      formData.append(name, value);
+    }
+
+    /* rehefa misy sary alefa */
+    if (logoFile) {
+      formData.append("logo", logoFile);
+    }
+
+    /* condition ajout na modifier */
+    if (idProd) {
+      axios
+        .put(`http://localhost:2000/updateProduit/${idProd}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          fetchData();
+          setLogoFile(null);
+          setLogoEdit(null);
+        });
+    }
+
+    setProduct({
+      design: "",
+      Pu: "",
+      Stock: "",
+    });
+  };
+
+  /* rehefa miova ny input tsirairay dia miova ny four*/
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setProduct((prevValues: any) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  /* rehefa mampiditra sary */
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setLogoFile(files[0]);
+    }
+  };
+
+  /* rehefa manindry bouton Modifier */
+  const handleEdit = (data: any) => {
+    const { idProd, ImgPro, ...other } = data;
+    setLogoEdit("http://localhost:2000/" + ImgPro); // src anle sary kely
+    setIdProd(idProd); // lasa put ny method ao am handleSubmit
+    setProduct(other); // ampidirina ao le donnée tao am tableau izay mitovy amle state initial ligne 15
+  };
+
+  /* rehefa supprimer */
+  const handleDelete = (id: any) => {
+    axios
+      .delete(`http://localhost:2000/deleteProduit/${id}`)
+      .then((response) => {
+        console.log(response);
+        fetchData();
+      });
+  };
+
+  /* recherche */
+  const handleSearch = (search: string | null) => {
+    if (search) {
+      axios
+        .get(`http://localhost:2000/recRehetraProduit/${search}`)
+        .then((res) => {
+          setProduct(res.data);
+        });
+    } else {
+      fetchData();
+    }
+  };
+
   return (
     <div className="apple lg:col-span-7  overflow-y-scroll">
-      <IonToolbar className="text-center"  >
+      <IonToolbar className="text-center">
         <IonTitle className="tracking-widest uppercase">
           <div className="titre font-bold flex justify-center gap-4">
-            <ProduitIcon/>
+            <ProduitIcon />
             Produits
           </div>
         </IonTitle>
@@ -49,8 +167,11 @@ function Produits() {
                 Quantité en Stock
               </label>
             </div>
-            
+
             <div className="relative z-0 w-full mb-6 group">
+              {logoEdit && (
+                <img src={logoEdit} className="w-20 h-20 rounded" alt="logo" />
+              )}
               <input
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 id="file_input"
@@ -100,7 +221,6 @@ function Produits() {
                 placeholder="Rechercher Produit..."
                 required
               />
-              
             </div>
           </form>
         </div>
@@ -111,6 +231,9 @@ function Produits() {
             <thead className="text-xs text-slate-200 uppercase bg-gray-700 ">
               <tr>
                 <th scope="col" className="px-6 py-3">
+                  Image
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Nom du Produit
                 </th>
                 <th scope="col" className="px-6 py-3">
@@ -119,35 +242,46 @@ function Produits() {
                 <th scope="col" className="px-6 py-3">
                   Quantité en Stock
                 </th>
-                <th scope="col" className="px-6 py-3">
-                  Image
-                </th>
+
                 <th scope="col" className="px-6 py-3">
                   <span className="sr-only">Edit</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-gray-700 ">
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-100 whitespace-nowrap dark:text-white"
-                >
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">Silver</td>
-                <td className="px-6 py-4">Laptop</td>
-                <td className="px-6 py-4">$2999</td>
-                <td className="px-6 py-4 text-right space-x-4 flex">
-                  <button className="font-medium text-gray-200 dark:text-slate-100 hover:underline">
-                    Modifier
-                  </button>
-                  <button className="font-medium text-red-600 dark:text-red-500 hover:underline">
-                    Supprimer
-                  </button>
-                </td>
-              </tr>
-              
+              {products.map((d, i) => (
+                <tr className="bg-gray-700 " key={i}>
+                  <td className="pl-4">
+                    <img
+                      src={`http://localhost:2000/${d.ImgPro}`}
+                      className="w-20 h-20 rounded"
+                    />
+                  </td>
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-100 whitespace-nowrap dark:text-white"
+                  >
+                    {d.design}
+                  </th>
+                  <td className="px-6 py-4">{d.Pu}</td>
+                  <td className="px-6 py-4">{d.Stock}</td>
+
+                  <td className="px-6 py-4 text-right space-x-4 flex">
+                    <button
+                      className="font-medium text-gray-200 dark:text-slate-100 hover:underline"
+                      onClick={handleEdit}
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                      onClick={() => handleDelete}
+                    >
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

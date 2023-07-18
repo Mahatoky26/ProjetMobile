@@ -114,6 +114,14 @@ const createAchat = (req, res) =>{
     const {body} = req;
     achat.create({...body}).then(()=>{res.status(200).json({msg : "success"})}).catch(error=>{res.status(500).json(error)})
 }
+const recIdAchatMax = (req, res) =>{
+    achat.findOne({
+      attributes: [
+        [sequelize.fn('MAX', sequelize.col('idAchat')), 'maxIdAchat']
+      ]
+    })
+    .then(f=>{res.status(200).json(f)}).catch(error=>{res.status(500).json(error)})
+  }
 const createDetAchat = (req, res) =>{
     const {body} = req;
     DetAchat.create({...body}).then(()=>{res.status(200).json({msg : "success"})}).catch(error=>{res.status(500).json(error)})
@@ -249,4 +257,4 @@ const chiffreMontant = (req, res) => {
 export {createFour,updateFour,recIdFour,recRehetraFour,deleteFour,AfficherTousFour,createProduitFour,recIdProduitFour
 ,createProduit,recIdProduit,recRehetraProduit,deleteProduit,updateProduit,AfficherTousProduit,createAchat,createDetAchat,recIdAchat,recIdDetAchat,
 AfficherTousAchat,recRehetraDetAchat,recAchatDate,createDetVente,createVente,recIdVente,recIdDetVente,AfficherTousVente,recRehetraDetVente,recVenteDate
-,chiffreDepense,chiffreMontant};
+,chiffreDepense,chiffreMontant,recIdAchatMax};

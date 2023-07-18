@@ -304,7 +304,7 @@ const Fournisseurs = () => {
                   >
                     {d.nomSociete}
                   </th>
-                  <td className="px-6 py-4">{d.idFour}</td>
+                  <td className="px-6 py-4">{d.nomGerant}</td>
                   <td className="px-6 py-4">{d.email}</td>
                   <td className="px-6 py-4">{d.Tel}</td>
                   <td className="px-6 py-4 text-right space-x-4">

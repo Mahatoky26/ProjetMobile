@@ -2,7 +2,7 @@ import { Router } from "express";
 import {createFour,updateFour,recIdFour, recRehetraFour, deleteFour, AfficherTousFour,
 createProduitFour,recIdProduitFour,createProduit,recIdProduit,recRehetraProduit,deleteProduit,updateProduit,AfficherTousProduit,createAchat,createDetAchat
 ,recAchatDate,AfficherTousAchat,recRehetraDetAchat,recIdAchat,recIdDetAchat,createDetVente,createVente,recIdVente,recIdDetVente,AfficherTousVente,recRehetraDetVente,recVenteDate
-,chiffreDepense,chiffreMontant}from "../controlleur/controlleur.js";
+,chiffreDepense,chiffreMontant,recIdAchatMax}from "../controlleur/controlleur.js";
 import multer from 'multer';
 import path from 'path';
 
@@ -55,6 +55,7 @@ router.get('/AfficherTousAchat', AfficherTousAchat);
 router.get('/recRehetraDetAchat/:id', recRehetraDetAchat);
 router.get('/recIdAchat/:id', recIdAchat);
 router.get('/recIdDetAchat/:id', recIdDetAchat);
+router.get('/recIdAchatMax', recIdAchatMax);
 
 //vente
 router.post('/createVente', createVente);
