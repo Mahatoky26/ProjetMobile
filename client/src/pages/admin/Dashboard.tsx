@@ -17,12 +17,12 @@ const Dashboard = () => {
       try {
         const a = 2023;
         const responseDepense = await axios.get(
-          `http://localhost:2000/chiffreDepense/${a}`
+          `http://192.168.43.251:2000/chiffreDepense/${a}`
         );
         setDepense(responseDepense.data);
 
         const responseMontants = await axios.get(
-          `http://localhost:2000/chiffreMontant/${a}`
+          `http://192.168.43.251:2000/chiffreMontant/${a}`
         );
         setMontants(responseMontants.data);
       } catch (error) {
@@ -55,7 +55,7 @@ const Dashboard = () => {
             }))}
             index="name"
             categories={["Total Depense"]}
-            colors={["#111111"]}
+            colors={["blue"]}
             valueFormatter={dataFormatter}
             yAxisWidth={48}
           />

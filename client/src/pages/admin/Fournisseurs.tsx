@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { IonIcon, IonTitle, IonToolbar } from "@ionic/react";
-import {search} from "ionicons/icons";
+import { search } from "ionicons/icons";
 import FournisseursIcon from "../../assets/FournisseursIcon";
+import { toast, ToastContainer } from "react-toastify";
 
 type Fournisseurs = {
   idFour: number | null;
@@ -15,7 +16,8 @@ type Fournisseurs = {
 
 const Fournisseurs = () => {
   const [fours, setFours] = useState<Fournisseurs[]>([]);
-  const [four, setFour] = useState({ // ampesaina am formData sy ny input ao am formulaire
+  const [four, setFour] = useState({
+    // ampesaina am formData sy ny input ao am formulaire
     nomSociete: "",
     nomGerant: "",
     email: "",
@@ -85,6 +87,8 @@ const Fournisseurs = () => {
       email: "",
       Tel: "",
     });
+
+    toast.success("Fournisseur modifié avec succès!");
   };
 
   /* rehefa miova ny input tsirairay dia miova ny four*/
@@ -135,10 +139,22 @@ const Fournisseurs = () => {
 
   return (
     <div className="apple lg:col-span-7 overflow-y-scroll">
-      <IonToolbar className="text-center"  >
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <IonToolbar className="text-center">
         <IonTitle className="tracking-widest uppercase">
           <div className="flex titre font-bold gap-4 justify-center">
-            <FournisseursIcon/>
+            <FournisseursIcon />
             Fournisseurs
           </div>
         </IonTitle>
@@ -215,10 +231,7 @@ const Fournisseurs = () => {
               />
             </div>
             <div className="flex justify-center">
-              <button
-                type="submit"
-                className="btn btn-primary"
-              >
+              <button type="submit" className="btn btn-primary">
                 Enregistrer
               </button>
             </div>
@@ -288,10 +301,7 @@ const Fournisseurs = () => {
             </thead>
             <tbody>
               {fours.map((d, i) => (
-                <tr
-                  className="bg-gray-700 space-y-2 "
-                  key={i}
-                >
+                <tr className="bg-gray-700 space-y-2 " key={i}>
                   <td className="pl-4">
                     <img
                       src={`http://localhost:2000/${d.logo}`}
@@ -307,19 +317,65 @@ const Fournisseurs = () => {
                   <td className="px-6 py-4">{d.nomGerant}</td>
                   <td className="px-6 py-4">{d.email}</td>
                   <td className="px-6 py-4">{d.Tel}</td>
-                  <td className="px-6 py-4 space-x-4">
+                  <td className="flex px-6 py-4 space-x-4">
                     <button
                       onClick={() => handleEdit(d)}
-                      className="btn btn-neutral"
+                      className="btn-xs lg:btn-md btn btn-neutral"
                     >
                       Modifier
                     </button>
-                    <button
-                      onClick={() => handleDelete(d.idFour)}
-                      className="btn btn-error text-white"
+                    <label
+                      className="btn-xs lg:btn-md btn btn-error text-white"
+                      htmlFor="my_modal_7"
+                      onClick={() => window.my_modal_5.showModal()}
                     >
                       Supprimer
-                    </button>
+                    </label>
+                    {/* <input
+                      type="checkbox"
+                      id="my_modal_7"
+                      className="modal-toggle"
+                    />
+                    <div className="modal">
+                      <div className="modal-box">
+                        <h3 className="text-lg font-bold">
+                          Voulez vous vraiment supprimer ?
+                        </h3>
+                        <div className="flex justify-center gap-4 items-center">
+                          <div className="modal-action"><button className="btn btn-neutral" onClick={() => handleDelete(d.idFour)}><label htmlFor="my_modal_7">Oui</label></button></div>
+                          <div className="modal-action"><button className="btn"><label htmlFor="my_modal_7">non</label></button></div>
+                        </div>
+                      </div>
+                      <label className="modal-backdrop" htmlFor="my_modal_7">
+                        Close
+                      </label>
+                    </div> */}
+
+                    <dialog
+                      id="my_modal_5"
+                      className="modal modal-bottom sm:modal-middle mx-12"
+                    >
+                      <form method="dialog" className="modal-box">
+                        <h3 className="text-lg text-white font-bold">
+                          Voulez vous vraiment supprimer ?
+                        </h3>
+                        <div className="flex justify-center gap-4 items-center">
+                          <div className="modal-action">
+                            <button
+                              className="btn btn-neutral"
+                              onClick={() => handleDelete(d.idFour)}
+                            >
+                              <label htmlFor="my_modal_7">Oui</label>
+                            </button>
+                          </div>
+                          <div className="modal-action">
+                            <button className="btn">
+                              <label htmlFor="my_modal_7" className="bg-red-200">non</label>
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </dialog>
                   </td>
                 </tr>
               ))}

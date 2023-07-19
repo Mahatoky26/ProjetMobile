@@ -61,9 +61,9 @@ const Login = () => {
         pauseOnHover
         theme="colored"
       />
-      <div className=" lg:p-2 lg:border lg:border-transparent lg:rounded-2xl lg:shadow-2xl">
+      <div className=" lg:p-8 lg:border lg:border-transparent lg:rounded-2xl lg:shadow-2xl">
         <div>
-          <h1 className="text-center">CONNEXION</h1>
+          <h1 className="text-center text-white titre">CONNEXION</h1>
         </div>
         <form>
           <div className="relative z-0 w-full mb-6 group">
@@ -71,7 +71,7 @@ const Login = () => {
               type="text"
               name="floating_email"
               id="floating_email"
-              className="block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 border-gray-300 focus:ring-0 peer"
+              className={`block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 focus:ring-0 peer ${ usernameEmpty ? "border-red-500" : "border-gray-300"}`}
               placeholder=" "
               value={username}
               ref={refUsername}
@@ -84,7 +84,8 @@ const Login = () => {
             />
             <label
               htmlFor="floating_email"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className={` peer-focus:font-medium absolute text-sm  dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${ usernameEmpty ? "text-red-500" : "text-gray-500"}`}
+              // peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6
             >
               Nom d'utilisateur
             </label>
@@ -94,7 +95,7 @@ const Login = () => {
               type="password"
               name="floating_password"
               id="floating_password"
-              className="block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 border-gray-300 focus:ring-0 peer"
+              className={`block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 focus:ring-0 peer ${ passwordEmpty ? "border-red-500" : "border-gray-300"}`}
               placeholder=" "
               onChange={(e) => {
                 {
@@ -109,14 +110,15 @@ const Login = () => {
             />
             <label
               htmlFor="floating_password"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className={` peer-focus:font-medium absolute text-sm  dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ${ passwordEmpty ? "text-red-500" : "text-gray-500"}`}
             >
               Mot de Passe
             </label>
           </div>
           <div className="flex justify-center">
             <button
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="btn btn-primary"
+              type="button"
               onClick={handleLogin}
             >
               Se connecter

@@ -2,6 +2,7 @@ import { IonTitle, IonToolbar } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import ProduitIcon from "../../assets/ProduitIcon";
 import axios from "axios";
+import { toast, ToastContainer } from 'react-toastify';
 // import Produits from './Produits';
 
 type Produit = {
@@ -286,19 +287,44 @@ const Produits = () => {
                   <td className="px-6 py-4">{d.Pu}</td>
                   <td className="px-6 py-4">{d.Stock}</td>
 
-                  <td className="px-6 py-4   space-x-4 flex">
+                  <td className="px-6 py-4  space-x-4 flex">
                     <button
-                      className="btn btn-neutral"
+                      className="btn-xs btn lg:btn-md btn-neutral"
                       onClick={() => handleEdit(d)}
                     >
                       Modifier
                     </button>
                     <button
-                      className="btn btn-error text-white"
-                      onClick={() => handleDelete(d.idProd)}
+                      className="btn-xs btn lg:btn-md btn-error text-white"
+                      onClick={() => window.my_modal_5.showModal()}
                     >
                       Supprimer
                     </button>
+                    <dialog
+                      id="my_modal_5"
+                      className="modal modal-bottom sm:modal-middle mx-12"
+                    >
+                      <form method="dialog" className="modal-box">
+                        <h3 className="text-lg text-white font-bold">
+                          Voulez vous vraiment supprimer ?
+                        </h3>
+                        <div className="flex justify-center gap-4 items-center">
+                          <div className="modal-action">
+                            <button
+                              className="btn btn-neutral"
+                              onClick={() => handleDelete(d.idProd)}
+                            >
+                              <label htmlFor="my_modal_7" onClick={() => handleDelete(d.idProd)}>Oui</label>
+                            </button>
+                          </div>
+                          <div className="modal-action">
+                            <button className="btn">
+                              <label htmlFor="my_modal_7" className="bg-red-200">non</label>
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </dialog>
                   </td>
                 </tr>
               ))}

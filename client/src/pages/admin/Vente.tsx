@@ -3,6 +3,7 @@ import AchatIcon from "../../assets/AchatIcon";
 import { QrReader } from "react-qr-reader";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import { toast, ToastContainer } from 'react-toastify';
 
 const Vente = () => {
   const [image, setImage] = useState() as any;
@@ -20,27 +21,34 @@ const Vente = () => {
   // * multiple add
   const [temp_product, setTempProduct] = useState<any[]>([]);
   const setProduct = () => {
+    axios.get(`http://localhost:2000/recIdProduit/${idProd}`).then((res: any) => {
+      if(res.data.Stock < qteRef.current.value){
+        toast.error(`Quantité en stock doit être inférieur à ${res.data.Stock}`);
+      }
+      else{
+        const newData = {
+          idProd: idProd,
+          ImgProFOur: image,
+          designFOur: designFour,
+          PuFour: puFour,
+          stock: stock,
+          Qte: qteRef.current.value,
+          Subtotal: (puFour * qteRef.current.value).toFixed(0),
+        };
+        const updatedSum = sumDepense + puFour * qteRef.current.value;
+        setSumDepense(updatedSum);
+        const updatedData = [...temp_product, newData]; // Create a new array with the new data
+        setTempProduct(updatedData);
+    
+        // * reset data
+        setImage("");
+        setDesignFour("");
+        setPuFour("");
+        qteRef.current.value = "";
+        // console.log(temp_product);
+      }
+    })
     // console.log(image,designFour,puFour);
-    const newData = {
-      idProd: idProd,
-      ImgProFOur: image,
-      designFOur: designFour,
-      PuFour: puFour,
-      stock: stock,
-      Qte: qteRef.current.value,
-      Subtotal: (puFour * qteRef.current.value).toFixed(0),
-    };
-    const updatedSum = sumDepense + puFour * qteRef.current.value;
-    setSumDepense(updatedSum);
-    const updatedData = [...temp_product, newData]; // Create a new array with the new data
-    setTempProduct(updatedData);
-
-    // * reset data
-    setImage("");
-    setDesignFour("");
-    setPuFour("");
-    qteRef.current.value = "";
-    // console.log(temp_product);
   };
 
   // * delete array product element
@@ -122,6 +130,8 @@ const Vente = () => {
             });
         });
     }
+    toast.success("Produit vendu avec succès!")
+    setTempProduct([]);
     // console.log(idAchat);
     // console.log(temp_product,idAchat);
   };
@@ -154,6 +164,18 @@ const Vente = () => {
   };
   return (
     <div className="apple lg:col-span-7  overflow-y-scroll space-y-4">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <IonToolbar className="text-center">
         <IonTitle className="tracking-widest uppercase">
           <div className="titre font-bold flex gap-4 justify-center">
@@ -299,10 +321,11 @@ const Vente = () => {
             </div>
 
             <button
+            type="button"
               onClick={buyAll}
               className="uppercase font-bold text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300  rounded-lg text-md w-auto px-8 py-4 text-center"
             >
-              Acheter
+              Vendre
             </button>
           </div>
         </div>

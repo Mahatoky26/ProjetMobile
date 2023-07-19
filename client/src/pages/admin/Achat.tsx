@@ -3,6 +3,7 @@ import AchatIcon from "../../assets/AchatIcon";
 import { QrReader } from "react-qr-reader";
 import axios from "axios";
 import { useRef, useState } from "react";
+import { toast, ToastContainer } from 'react-toastify';
 
 const Achat = () => {
   const [image, setImage] = useState("") as any;
@@ -103,6 +104,7 @@ const Achat = () => {
     } catch (error) {
       console.error("Une erreur s'est produite :", error);
     }
+    toast.success("Produit acheté avec succès!")
   };
 
   function handleScan(data: any) {
@@ -129,7 +131,19 @@ const Achat = () => {
     width: 320,
   };
   return (
-    <div className="apple lg:col-span-7  overflow-y-scroll space-y-4">
+    <div className="apple lg:col-span-7  overflow-y-scroll">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <IonToolbar className="text-center">
         <IonTitle className="tracking-widest uppercase">
           <div className="titre font-bold flex gap-4 justify-center">
@@ -272,7 +286,7 @@ const Achat = () => {
                   <td className="px-6 py-4  space-x-4">
                     <button
                       onClick={() => deleteProduct(i)}
-                      className="btn btn-error text-white"
+                      className="btn btn-xs lg:btn-md btn-error text-white"
                     >
                       Supprimer
                     </button>
@@ -304,6 +318,7 @@ const Achat = () => {
               />
             </div>
             <button
+            type="button"
               onClick={buyAll}
               className="uppercase font-bold text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300  rounded-lg text-md w-auto px-8 py-4 text-center"
             >
