@@ -217,7 +217,7 @@ const Fournisseurs = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="uppercase text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-md w-auto px-8 py-4 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="btn btn-primary"
               >
                 Enregistrer
               </button>
@@ -295,7 +295,7 @@ const Fournisseurs = () => {
                   <td className="pl-4">
                     <img
                       src={`http://localhost:2000/${d.logo}`}
-                      className="w-20 h-20 rounded"
+                      className="w-20 h-20 rounded-full"
                     />
                   </td>
                   <th
@@ -307,16 +307,16 @@ const Fournisseurs = () => {
                   <td className="px-6 py-4">{d.nomGerant}</td>
                   <td className="px-6 py-4">{d.email}</td>
                   <td className="px-6 py-4">{d.Tel}</td>
-                  <td className="px-6 py-4 text-right space-x-4">
+                  <td className="px-6 py-4 space-x-4">
                     <button
                       onClick={() => handleEdit(d)}
-                      className="font-medium text-gray-300 dark:text-slate-100 hover:underline"
+                      className="btn btn-neutral"
                     >
                       Modifier
                     </button>
                     <button
                       onClick={() => handleDelete(d.idFour)}
-                      className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                      className="btn btn-error text-white"
                     >
                       Supprimer
                     </button>

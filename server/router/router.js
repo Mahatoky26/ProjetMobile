@@ -2,7 +2,7 @@ import { Router } from "express";
 import {createFour,updateFour,recIdFour, recRehetraFour, deleteFour, AfficherTousFour,
 createProduitFour,recIdProduitFour,createProduit,recIdProduit,recRehetraProduit,deleteProduit,updateProduit,AfficherTousProduit,createAchat,createDetAchat
 ,recAchatDate,AfficherTousAchat,recRehetraDetAchat,recIdAchat,recIdDetAchat,createDetVente,createVente,recIdVente,recIdDetVente,AfficherTousVente,recRehetraDetVente,recVenteDate
-,chiffreDepense,chiffreMontant,recIdAchatMax}from "../controlleur/controlleur.js";
+,chiffreDepense,chiffreMontant,recIdAchatMax,recIdVenteMax,updateStock}from "../controlleur/controlleur.js";
 import multer from 'multer';
 import path from 'path';
 
@@ -42,6 +42,7 @@ router.get('/recIdProduitFour/:id', recIdProduitFour);
 //produit
 router.post('/createProduit', createProduit);
 router.put('/updateProduit/:id',upload1.single('ImgPro'), updateProduit);
+router.put('/updateStock/:id',updateStock);
 router.get('/AfficherTousProduit', AfficherTousProduit);
 router.get('/recIdProduit/:id', recIdProduit);
 router.get('/recRehetraProduit/:id', recRehetraProduit);
@@ -65,6 +66,7 @@ router.get('/AfficherTousVente', AfficherTousVente);
 router.get('/recRehetraDetVente/:id', recRehetraDetVente);
 router.get('/recIdVente/:id', recIdVente);
 router.get('/recIdDetVente/:id', recIdDetVente);
+router.get('/recIdVenteMax', recIdVenteMax);
 
 //chiffre depense
 router.get('/chiffreDepense/:id', chiffreDepense);

@@ -5,21 +5,18 @@ import axios from "axios";
 import { useRef, useState } from "react";
 
 const Achat = () => {
-  const [image, setImage] = useState() as any;
-  const [designFour, setDesignFour] = useState() as any;
-  const [puFour, setPuFour] = useState() as any;
-  const [idProd, setIdProd] = useState() as any;
+  const [image, setImage] = useState("") as any;
+  const [designFour, setDesignFour] = useState("") as any;
+  const [puFour, setPuFour] = useState("") as any;
+  const [idProd, setIdProd] = useState("") as any;
   const [sumDepense, setSumDepense] = useState(0) as any;
-
-  const qteRef = useRef() as any;
+  const qteRef = useRef() as any ;
   const date_buy = useRef() as any;
   const id_four = useRef() as any;
+  const [temp_product, setTempProduct] = useState([]) as any;
+  const [idAchat, setIdAchat] = useState("") as any;
 
-  const [idAchat, setIdAchat] = useState(0);
-  // * multiple add
-  const [temp_product, setTempProduct] = useState<any[]>([]);
   const setProduct = () => {
-    // console.log(image,designFour,puFour);
     const newData = {
       idProd: idProd,
       ImgProFOur: image,
@@ -28,92 +25,97 @@ const Achat = () => {
       Qte: qteRef.current.value,
       Subtotal: (puFour * qteRef.current.value).toFixed(0),
     };
-    const updatedData = [...temp_product, newData]; // Create a new array with the new data
+    const updatedSum = sumDepense + puFour * qteRef.current.value;
+    setSumDepense(updatedSum);
+
+    const updatedData = [...temp_product, newData];
     setTempProduct(updatedData);
 
-    // * reset data
     setImage("");
     setDesignFour("");
     setPuFour("");
     qteRef.current.value = "";
-    // console.log(temp_product);
   };
 
-  // * delete array product element
   const deleteProduct = (i: any) => {
     const tempProductCopy = [...temp_product];
+    const removedItemSubtotal = parseInt(tempProductCopy[i].Subtotal);
     tempProductCopy.splice(i, 1);
     setTempProduct(tempProductCopy);
+    const updatedSum = sumDepense - removedItemSubtotal;
+    setSumDepense(updatedSum);
   };
 
-  // * buy all
-  const buyAll = () => {
-    setSumDepense(
-      temp_product.reduce(
-        (accumulator: any, item) => accumulator + parseInt(item.Subtotal),
-        0
-      )
-    );
+  const buyAll = async () => {
     const data = {
       idFour: parseInt(id_four.current.value),
       depense: parseInt(sumDepense),
       dateAchat: date_buy.current.value,
     };
-
-    // * post achat
-    axios.post("http://localhost:2000/createAchat", data).then((response) => {
-      axios.get(`http://localhost:2000/recIdAchatMax`).then((res) => {
-        setIdAchat(res.data.maxIdAchat);
-      });
-    });
-
-    // console.log(temp_product,idAchat);
-
-    // * multiple buy
-    for (let index = 0; index < temp_product.length; index++) {
-      const elements = {
-        idAchat: idAchat,
-        idFour: parseInt(id_four.current.value),
-        idProd: temp_product[index]["idProd"],
-        ImgPro: temp_product[index]["ImgProFOur"],
-        design: temp_product[index]["designFOur"],
-        PuFour: temp_product[index]["PuFour"],
-        Qte: temp_product[index]["Qte"],
-        Subtotal: temp_product[index]["Subtotal"],
-        dateAchat: date_buy.current.value,
-      };
-      const element = {
-        idProd: temp_product[index]["idProd"],
-        ImgPro: temp_product[index]["ImgProFOur"],
-        design: temp_product[index]["designFOur"],
-        Stock: temp_product[index]["Qte"],
-      };
-      // * ty le miajpute amle table detAchats
-      axios.post("http://localhost:2000/createDetAchat", elements).then((response) => {
-        console.log("ok beeeee");
-      });
-      axios.post("http://localhost:2000/createProduit", element).then((response) => {
-        console.log("ok kind");
-      });
-
-
+  
+    try {
+      // * post achat
+      await axios.post("http://localhost:2000/createAchat", data);
+      const res = await axios.get("http://localhost:2000/recIdAchatMax");
+      const maxIdAchat = res.data.maxIdAchat;
+  
+      for (let index = 0; index < temp_product.length; index++) {
+        const existingProduct = await axios.get(
+          `http://localhost:2000/recIdProduit/${temp_product[index].idProd}`
+        );
+  
+        if (existingProduct.data && existingProduct.data.idProd) {
+          // Le produit existe déjà, mettons à jour le stock
+          const newStock =
+            parseInt(existingProduct.data.Stock) +
+            parseInt(temp_product[index].Qte);
+          await axios.put(
+            `http://localhost:2000/updateStock/${existingProduct.data.idProd}`,
+            { Stock: newStock }
+          );
+        } else {
+          // Le produit n'existe pas, ajoutons un nouveau produit
+          await axios.post("http://localhost:2000/createProduit", {
+            idProd: temp_product[index].idProd,
+            ImgPro: temp_product[index].ImgProFOur,
+            design: temp_product[index].designFOur,
+            Stock: temp_product[index].Qte,
+          });
+        }
+  
+        // Ajoutons le détail de l'achat pour ce produit
+        const elements = {
+          idAchat: maxIdAchat,
+          idFour: parseInt(id_four.current.value),
+          idProd: temp_product[index].idProd,
+          ImgPro: temp_product[index].ImgProFOur,
+          design: temp_product[index].designFOur,
+          PuFour: temp_product[index].PuFour,
+          Qte: temp_product[index].Qte,
+          Subtotal: temp_product[index].Subtotal,
+          dateAchat: date_buy.current.value,
+        };
+        await axios.post("http://localhost:2000/createDetAchat", elements);
+      }
+  
+      console.log("Achat effectué avec succès !");
+      setTempProduct([]);
+    } catch (error) {
+      console.error("Une erreur s'est produite :", error);
     }
   };
 
-  function handleScan(data: String) {
+  function handleScan(data: any) {
     console.log(data);
   }
-  function handleError(err: Error) {
+  function handleError(err: any) {
     console.error(err);
   }
-  function handleResult(result: String) {
+  function handleResult(result: any) {
     if (result) {
-      console.log(result);
       axios
         .get(`http://localhost:2000/recIdProduitFour/${result}`)
-
         .then((res) => {
-          console.log(res.data);
           setIdProd(res.data.idProdFour);
           setImage(res.data.ImgProFour);
           setDesignFour(res.data.designFour);
@@ -121,6 +123,7 @@ const Achat = () => {
         });
     }
   }
+
   const previewStyle = {
     height: 240,
     width: 320,
@@ -217,7 +220,7 @@ const Achat = () => {
               <button
                 onClick={setProduct}
                 type="submit"
-                className="uppercase font-bold text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300  rounded-lg text-md w-auto px-8 py-4 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="btn btn-primary"
               >
                 Ajouter
               </button>
@@ -252,10 +255,10 @@ const Achat = () => {
             </thead>
             <tbody>
               {temp_product.map((d: any, i: any) => (
-                <tr className="bg-gray-700" key={i}>
+                <tr className="bg-gray-700 pl-4" key={i}>
                   <img
                     src={`http://localhost:2000/${d.ImgProFOur}`}
-                    className="w-20 h-20 rounded"
+                    className="w-20 h-20 rounded-full"
                   />
                   <th
                     scope="row"
@@ -266,10 +269,10 @@ const Achat = () => {
                   <td className="px-6 py-4">{d.PuFour}</td>
                   <td className="px-6 py-4">{d.Qte}</td>
                   <td className="px-6 py-4">{d.Subtotal}</td>
-                  <td className="px-6 py-4 text-right space-x-4">
+                  <td className="px-6 py-4  space-x-4">
                     <button
                       onClick={() => deleteProduct(i)}
-                      className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                      className="btn btn-error text-white"
                     >
                       Supprimer
                     </button>
@@ -279,19 +282,22 @@ const Achat = () => {
             </tbody>
           </table>
         </div>
+        <div className="text-right text-xl lg:text-2xl">Somme : <span className="text-2xl lg:text-4xl font-bold">{sumDepense} </span>Ar</div>
         <div
           className={
-            temp_product.length === 0 ? "hidden" : "flex justify-center my-2"
+            temp_product.length === 0
+              ? "hidden"
+              : "flex flex-col items-end w-1/2 lg:w-full my-2"
           }
-          >
-          <div>Somme : {sumDepense} Ar</div>
-          <div>
-            <div>
-              <input ref={date_buy} type="date" />
+        >
+          <div className="space-y-4">
+            <div className="bg-gray-500 rounded-lg">
+              <input ref={date_buy} type="date" className="bg-gray-500 rounded-lg w-full" />
             </div>
             <div>
               <input
                 ref={id_four}
+                className="bg-transparent border-b-gray-500 border-b-2 text-white rounded-lg"
                 placeholder="id four"
                 type="number"
                 value={1}
@@ -299,7 +305,7 @@ const Achat = () => {
             </div>
             <button
               onClick={buyAll}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-md w-auto px-8 py-4 text-center"
+              className="uppercase font-bold text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300  rounded-lg text-md w-auto px-8 py-4 text-center"
             >
               Acheter
             </button>

@@ -4,54 +4,62 @@ import ProduitIcon from "../../assets/ProduitIcon";
 import axios from "axios";
 // import Produits from './Produits';
 
-type Produits = {
-  idProd: any;
+type Produit = {
+  idProd: number | null;
   ImgPro: string;
   design: string;
   Pu: number | undefined;
   Stock: number | undefined;
 };
 
-function Produits() {
-  const [products, setProducts] = useState<Produits[]>([]);
+const Produits = () => {
+  const [products, setProducts] = useState<Produit[]>([]);
   const [product, setProduct] = useState({
-    // ampesaina am formData sy ny input ao am formulaire
+    idProd: "",
+    ImgPro: "",
     design: "",
     Pu: "",
     Stock: "",
   });
-  const [logoEdit, setLogoEdit] = useState<string | null>(null); // sary kely rehefa modif
-  const [logoFile, setLogoFile] = useState<File | null>(null); // fichier sary
-  const [idProd, setIdProd] = useState<number | null>(null); //ho an condition post sy put, refa misy de put, refa tsis de post
+  const [logoEdit, setLogoEdit] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [idProd, setIdProd] = useState<number | null>(null); 
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = () => {
-    axios.get("http://localhost:2000/AfficherTousProduit").then((res) => {
-      setProduct(res.data);
+    axios.get("http://localhost:2000/AfficherTousProduit").then((res: any) => {
+      setProducts(res.data);
     });
   };
 
-  /* submit form */
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData();
-
-    /* ampidirina tsirairay anaty formData ny anaty four */
-    for (const [name, value] of Object.entries(product)) {
-      formData.append(name, value);
+    for (const [name, value]  of Object.entries(product) as any)  {
+      formData.append(name, value.toString());
     }
 
-    /* rehefa misy sary alefa */
     if (logoFile) {
-      formData.append("logo", logoFile);
+      formData.append("ImgPro", logoFile);
     }
 
-    /* condition ajout na modifier */
-    if (idProd) {
+    if (!idProd) {
+      axios
+        .post("http://localhost:2000/createProduit", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          fetchData();
+          setLogoFile(null);
+        });
+    } else {
       axios
         .put(`http://localhost:2000/updateProduit/${idProd}`, formData, {
           headers: {
@@ -67,22 +75,21 @@ function Produits() {
     }
 
     setProduct({
+      idProd: "",
+      ImgPro: "",
       design: "",
       Pu: "",
       Stock: "",
     });
   };
-
-  /* rehefa miova ny input tsirairay dia miova ny four*/
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setProduct((prevValues: any) => ({
+    setProduct((prevValues :any) => ({
       ...prevValues,
       [name]: value,
     }));
   };
 
-  /* rehefa mampiditra sary */
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -90,36 +97,32 @@ function Produits() {
     }
   };
 
-  /* rehefa manindry bouton Modifier */
-  const handleEdit = (data: any) => {
-    const { idProd, ImgPro, ...other } = data;
-    setLogoEdit("http://localhost:2000/" + ImgPro); // src anle sary kely
+  const handleEdit = (data: Produit) => {
+    const { idProd, ImgPro, ...other } = data as any;
+    setLogoEdit("http://localhost:2000/" + ImgPro);
     setIdProd(idProd); // lasa put ny method ao am handleSubmit
-    setProduct(other); // ampidirina ao le donnée tao am tableau izay mitovy amle state initial ligne 15
+    setProduct(other); 
   };
 
-  /* rehefa supprimer */
-  const handleDelete = (id: any) => {
-    axios
-      .delete(`http://localhost:2000/deleteProduit/${id}`)
-      .then((response) => {
-        console.log(response);
-        fetchData();
-      });
+  const handleDelete = (id: number | null) => {
+    axios.delete(`http://localhost:2000/deleteProduit/${id}`).then((response) => {
+      console.log(response);
+      fetchData();
+    });
   };
 
-  /* recherche */
   const handleSearch = (search: string | null) => {
     if (search) {
       axios
         .get(`http://localhost:2000/recRehetraProduit/${search}`)
         .then((res) => {
-          setProduct(res.data);
+          setProducts(res.data);
         });
     } else {
       fetchData();
     }
   };
+
 
   return (
     <div className="apple lg:col-span-7  overflow-y-scroll">
@@ -133,12 +136,17 @@ function Produits() {
       </IonToolbar>
       <div className=" lg:grid lg:grid-cols-2">
         <div className="p-8">
-          <form>
+
+          {/* form begin */}
+          <form encType="multipart/form-data" onSubmit={handleSubmit}>
             <div className="relative z-0 w-full mb-6 group">
               <input
                 type="text"
                 className="block py-2.5 px-0 w-full text-sm text-slate-100 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
+                value={product.design}
+                name="design"
+                onChange={handleChange}
                 required
               />
               <label className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
@@ -150,6 +158,9 @@ function Produits() {
                 type="number"
                 className="block py-2.5 px-0 w-full text-sm text-slate-100 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
+                value={product.Pu}
+                name="Pu"
+                onChange={handleChange}
                 required
               />
               <label className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
@@ -161,6 +172,9 @@ function Produits() {
                 type="number"
                 className="block py-2.5 px-0 w-full text-sm text-slate-100 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
+                value={product.Stock}
+                name="Stock"
+                onChange={handleChange}
                 required
               />
               <label className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
@@ -175,21 +189,25 @@ function Produits() {
               <input
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 id="file_input"
+                onChange={handleFileChange}
                 type="file"
+                name="ImgPro"
               />
             </div>
             <div className="flex justify-center">
-              <button
+            <button
                 type="submit"
-                className="uppercase text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-md w-auto px-8 py-4 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="btn btn-primary"
               >
-                Ajouter Produit
+                Enregistrer
               </button>
             </div>
           </form>
+
+          {/* form end */}
         </div>
-        <div className="p-8 lg:translate-y-24 lg:translate-x-40 lg:w-2/3">
-          <form>
+        <div className="p-8 lg:translate-y-32 lg:translate-x-40 lg:w-2/3">
+          <div>
             <label
               htmlFor="default-search"
               className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -217,14 +235,16 @@ function Produits() {
               <input
                 type="search"
                 id="default-search"
+                onChange={(e) => handleSearch(e.target.value)}
                 className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Rechercher Produit..."
-                required
+                placeholder="Rechercher Fournisseur..."
               />
             </div>
-          </form>
+          </div>
         </div>
       </div>
+
+      {/* table */}
       <div className=" p-4 lg:p-16">
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left text-slate-100 ">
@@ -254,7 +274,7 @@ function Produits() {
                   <td className="pl-4">
                     <img
                       src={`http://localhost:2000/${d.ImgPro}`}
-                      className="w-20 h-20 rounded"
+                      className="w-20 h-20 rounded-full"
                     />
                   </td>
                   <th
@@ -266,16 +286,16 @@ function Produits() {
                   <td className="px-6 py-4">{d.Pu}</td>
                   <td className="px-6 py-4">{d.Stock}</td>
 
-                  <td className="px-6 py-4 text-right space-x-4 flex">
+                  <td className="px-6 py-4   space-x-4 flex">
                     <button
-                      className="font-medium text-gray-200 dark:text-slate-100 hover:underline"
-                      onClick={handleEdit}
+                      className="btn btn-neutral"
+                      onClick={() => handleEdit(d)}
                     >
                       Modifier
                     </button>
                     <button
-                      className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                      onClick={() => handleDelete}
+                      className="btn btn-error text-white"
+                      onClick={() => handleDelete(d.idProd)}
                     >
                       Supprimer
                     </button>

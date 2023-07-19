@@ -98,9 +98,19 @@ const updateProduit = (req, res) =>{
         f.design = body.design;
         f.Stock = body.Stock;
         f.Pu = body.Pu;
-        f.ImgPro = req.file.filename;
+        if(req.file){
+          f.ImgPro = req.file.filename;
+        }
         f.save().then(() => res.status(200).json({msg : "success"})).catch(error=>{res.status()})
     }).catch(error=>{res.status(500).json(error)})
+}
+const updateStock = (req, res) =>{
+  const {body} = req;
+  const {id} = req.params;
+  produit.findByPk(id).then(f =>{
+      f.Stock = body.Stock;
+      f.save().then(() => res.status(200).json({msg : "success"})).catch(error=>{res.status()})
+  }).catch(error=>{res.status(500).json(error)})
 }
 const deleteProduit = (req, res) =>{
     const {id}= req.params;
@@ -147,7 +157,6 @@ const recRehetraDetAchat=(req,res) =>{
             { idAchat: { [Op.like]: `%${id}%` } },
             { idFour: { [Op.like]: `%${id}%` } },
             { idProd: { [Op.like]: `%${id}%` } },
-            { ImgPro: { [Op.like]: `%${id}%` } },
             { design: { [Op.like]: `%${id}%` } },
             { PuFour: { [Op.like]: `%${id}%` } },
             {  Qte: { [Op.like]: `%${id}%` } },
@@ -161,8 +170,7 @@ const recRehetraDetAchat=(req,res) =>{
 }
 
 const recAchatDate = (req, res) => {
-    const {date1} = req.params.date1
-    const {date2} = req.params.date2
+  const { date1, date2 } = req.params;
     DetAchat.findAll({
         where: {
           dateAchat: {
@@ -177,6 +185,14 @@ const recAchatDate = (req, res) => {
 const createVente = (req, res) =>{
     const {body} = req;
     vente.create({...body}).then(()=>{res.status(200).json({msg : "success"})}).catch(error=>{res.status(500).json(error)})
+}
+const recIdVenteMax = (req, res) =>{
+  vente.findOne({
+    attributes: [
+      [sequelize.fn('MAX', sequelize.col('idVente')), 'maxIdVente']
+    ]
+  })
+  .then(f=>{res.status(200).json(f)}).catch(error=>{res.status(500).json(error)})
 }
 const createDetVente = (req, res) =>{
     const {body} = req;
@@ -202,7 +218,6 @@ const recRehetraDetVente=(req,res) =>{
           [Op.or]: [
             { idVente: { [Op.like]: `%${id}%` } },
             { idProd: { [Op.like]: `%${id}%` } },
-            { ImgPro: { [Op.like]: `%${id}%` } },
             { design: { [Op.like]: `%${id}%` } },
             { Pu: { [Op.like]: `%${id}%` } },
             {  Qte: { [Op.like]: `%${id}%` } },
@@ -216,11 +231,10 @@ const recRehetraDetVente=(req,res) =>{
 }
 
 const recVenteDate = (req, res) => {
-    const {date1} = req.params.date1
-    const {date2} = req.params.date2
+  const { date1, date2 } = req.params;
     DetVente.findAll({
         where: {
-          dateAchat: {
+          dateVente: {
             [sequelize.Op.between]: [date1, date2]
           }
         }
@@ -234,7 +248,7 @@ const chiffreDepense = (req, res) => {
     
     achat.findAll({
         attributes: ['idFour', [sequelize.fn('SUM', sequelize.col('depense')), 'totalDepense']],
-        where: sequelize.where(sequelize.fn('YEAR', sequelize.col('dateAchat')), sequelize.col('id')),
+        where: sequelize.where(sequelize.fn('YEAR', sequelize.col('dateAchat')), id),
         group: ['idFour']
     }).then(f => {res.status(200).json(f)})
     .catch(error=>{res.status(500).json(error)})
@@ -248,7 +262,7 @@ const chiffreMontant = (req, res) => {
           [sequelize.fn('MONTH', sequelize.col('dateVente')), 'month'],
           [sequelize.fn('SUM', sequelize.col('montant')), 'totalMontant']
         ],
-        where: sequelize.where(sequelize.fn('YEAR', sequelize.col('dateVente')), sequelize.col('id')),
+        where: sequelize.where(sequelize.fn('YEAR', sequelize.col('dateVente')), id),
         group: [sequelize.fn('MONTH', sequelize.col('dateVente'))]
       }).then(f => {res.status(200).json(f)})
       .catch(error=>{res.status(500).json(error)})
@@ -257,4 +271,4 @@ const chiffreMontant = (req, res) => {
 export {createFour,updateFour,recIdFour,recRehetraFour,deleteFour,AfficherTousFour,createProduitFour,recIdProduitFour
 ,createProduit,recIdProduit,recRehetraProduit,deleteProduit,updateProduit,AfficherTousProduit,createAchat,createDetAchat,recIdAchat,recIdDetAchat,
 AfficherTousAchat,recRehetraDetAchat,recAchatDate,createDetVente,createVente,recIdVente,recIdDetVente,AfficherTousVente,recRehetraDetVente,recVenteDate
-,chiffreDepense,chiffreMontant,recIdAchatMax};
+,chiffreDepense,chiffreMontant,recIdAchatMax,recIdVenteMax,updateStock};
